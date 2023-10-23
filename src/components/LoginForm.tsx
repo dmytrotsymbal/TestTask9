@@ -1,20 +1,27 @@
 import React, { useState } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import axios from "axios";
 import "../styles/App.css";
 
 type Props = {};
 const LoginForm = (props: Props) => {
   const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = (values: any) => {
-    const username = values.username;
-    const password = values.password;
+  const onSubmit = async (values: any) => {
+    try {
+      const response = await axios.post("http://146.190.118.121/api/login/", {
+        username: values.username,
+        password: values.password,
+      });
 
-    if (username === "testuser" && password === "testpassword123") {
-      window.location.href = "/table";
-    } else {
-      setError("Incorrect username or password");
+      if (response.status === 200) {
+        window.location.href = "/table";
+      } else {
+        setError("Incorrect username or password");
+      }
+    } catch (error) {
+      setError("An error occurred while processing your request");
     }
   };
 
