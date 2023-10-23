@@ -1,0 +1,47 @@
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 300px;
+  margin: 30px auto;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  background: #fff;
+
+  label {
+    font-size: 12px;
+  }
+  input {
+    width: 100%;
+    padding: 5px;
+    margin: 0px 0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    margin-bottom: 10px;
+  }
+
+  .error {
+    color: #ff0000;
+    font-size: 12px;
+    text-align: left;
+    margin-top: 0px;
+  }
+
+  .alertMessageBackground {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+
+    .alertMessage {
+      position: absolute;
+      top: 150px;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+}

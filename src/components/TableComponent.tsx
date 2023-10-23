@@ -1,45 +1,58 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
+import { Table, Button, Pagination } from "react-bootstrap";
 
-interface TableData {
+type TableData = {
   name: string;
   email: string;
   birthday_date: string;
   phone_number: string;
   address?: string;
-}
+};
 
-interface TableRow {
+type TableRow = {
   id: number;
   data: TableData;
   isEditing: boolean;
-}
+};
 
 const apiUrl = "http://146.190.118.121/api/table/";
+const limit = 10;
 
-const Table: React.FC = () => {
+const TableComponent = () => {
   const [tableData, setTableData] = useState<TableRow[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
-    // Завантаження даних із сервера при завантаженні компонента
+    fetchData(currentPage);
+  }, [currentPage]);
+
+  const fetchData = (page: number) => {
+    const offset = (page - 1) * limit;
+    const url = `${apiUrl}?limit=${limit}&offset=${offset}`;
+
     axios
-      .get(apiUrl)
+      .get(url)
       .then((response) => {
         const data = response.data.results;
         const tableRows = data.map((item: TableData, index: number) => ({
-          id: index + 1, // Можна використовувати id, отриманий від сервера, якщо він є
+          id: index + 1,
           data: item,
           isEditing: false,
         }));
         setTableData(tableRows);
+
+        const totalCount = response.data.count;
+        const totalPages = Math.ceil(totalCount / limit);
+        setTotalPages(totalPages);
       })
       .catch((error) => {
         console.error("Помилка завантаження даних:", error);
       });
-  }, []);
+  };
 
   const handleEdit = (id: number) => {
-    // Оновлення стану редагування для відповідного рядка
     const updatedData = tableData.map((row) => ({
       ...row,
       isEditing: row.id === id,
@@ -67,9 +80,13 @@ const Table: React.FC = () => {
     }
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
-    <div>
-      <table>
+    <>
+      <Table striped bordered hover>
         <thead>
           <tr>
             <th>Name</th>
@@ -160,7 +177,7 @@ const Table: React.FC = () => {
                     />
                   </td>
                   <td>
-                    <button onClick={() => handleSave(row.id)}>Save</button>
+                    <Button onClick={() => handleSave(row.id)}>Save</Button>
                   </td>
                 </>
               ) : (
@@ -171,16 +188,32 @@ const Table: React.FC = () => {
                   <td>{row.data.phone_number}</td>
                   <td>{row.data.address}</td>
                   <td>
-                    <button onClick={() => handleEdit(row.id)}>Edit</button>
+                    <Button
+                      variant="warning"
+                      onClick={() => handleEdit(row.id)}
+                    >
+                      Edit
+                    </Button>
                   </td>
                 </>
               )}
             </tr>
           ))}
         </tbody>
-      </table>
-    </div>
+      </Table>
+      <Pagination>
+        {Array.from({ length: totalPages }, (_, index) => (
+          <Pagination.Item
+            key={index + 1}
+            active={currentPage === index + 1}
+            onClick={() => handlePageChange(index + 1)}
+          >
+            {index + 1}
+          </Pagination.Item>
+        ))}
+      </Pagination>
+    </>
   );
 };
 
-export default Table;
+export default TableComponent;

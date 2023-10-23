@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
-import "../styles/App.css";
+import "../styles/LoginForm.scss";
+import { Button } from "react-bootstrap";
+import AlertMessage from "./AlertMessage";
 
 type Props = {};
 const LoginForm = (props: Props) => {
@@ -14,7 +16,6 @@ const LoginForm = (props: Props) => {
         username: values.username,
         password: values.password,
       });
-
       if (response.status === 200) {
         window.location.href = "/table";
       } else {
@@ -38,18 +39,33 @@ const LoginForm = (props: Props) => {
       onSubmit={onSubmit}
     >
       <Form>
-        <div>
+        <h2>Sign In</h2>
+        <div className="form-group">
           <label htmlFor="username">Username:</label>
-          <Field type="text" id="username" name="username" />
-          <ErrorMessage name="username" component="div" />
+          <Field
+            type="text"
+            id="username"
+            name="username"
+            className="form-control"
+            placeholder="Username"
+          />
+          <ErrorMessage name="username" component="div" className="error" />
         </div>
-        <div>
+        <div className="form-group">
           <label htmlFor="password">Password:</label>
-          <Field type="password" id="password" name="password" />
-          <ErrorMessage name="password" component="div" />
+          <Field
+            type="password"
+            id="password"
+            name="password"
+            className="form-control"
+            placeholder="Password"
+          />
+          <ErrorMessage name="password" component="div" className="error" />
         </div>
-        <button type="submit">Sign In</button>
-        {error && <div className="error">{error}</div>}
+        <Button type="submit" className="btn btn-primary">
+          Sign In
+        </Button>
+        {error && <AlertMessage error={error} setError={setError} />}
       </Form>
     </Formik>
   );
