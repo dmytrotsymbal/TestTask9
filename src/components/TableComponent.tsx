@@ -1,87 +1,25 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { Table, Button, Pagination } from "react-bootstrap";
-
-type TableData = {
-  name: string;
-  email: string;
-  birthday_date: string;
-  phone_number: string;
-  address?: string;
-};
-
-type TableRow = {
-  id: number;
-  data: TableData;
-  isEditing: boolean;
-};
-
-const apiUrl = "http://146.190.118.121/api/table/";
-const limit = 10;
+import { useEffect } from "react";
+import { Table, Button } from "react-bootstrap";
+import { useAppSelector, useAppDispatch } from "../redux/hooks";
+import { editRow, saveRow, fetchTableData } from "../redux/tableSlice";
+import PaginationElement from "./PaginationElement";
 
 const TableComponent = () => {
-  const [tableData, setTableData] = useState<TableRow[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
+  const tableData = useAppSelector((state) => state.table.tableData);
+  const currentPage = useAppSelector((state) => state.table.currentPage);
+
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    fetchData(currentPage);
-  }, [currentPage]);
-
-  const fetchData = (page: number) => {
-    const offset = (page - 1) * limit;
-    const url = `${apiUrl}?limit=${limit}&offset=${offset}`;
-
-    axios
-      .get(url)
-      .then((response) => {
-        const data = response.data.results;
-        const tableRows = data.map((item: TableData, index: number) => ({
-          id: index + 1,
-          data: item,
-          isEditing: false,
-        }));
-        setTableData(tableRows);
-
-        const totalCount = response.data.count;
-        const totalPages = Math.ceil(totalCount / limit);
-        setTotalPages(totalPages);
-      })
-      .catch((error) => {
-        console.error("Помилка завантаження даних:", error);
-      });
-  };
+    dispatch(fetchTableData(currentPage));
+  }, [currentPage, dispatch]);
 
   const handleEdit = (id: number) => {
-    const updatedData = tableData.map((row) => ({
-      ...row,
-      isEditing: row.id === id,
-    }));
-    setTableData(updatedData);
+    dispatch(editRow({ id }));
   };
 
   const handleSave = (id: number) => {
-    // Відправка змінених даних на сервер та оновлення стану
-    const editedRow = tableData.find((row) => row.id === id);
-    if (editedRow) {
-      axios
-        .put(`${apiUrl}${id}`, editedRow.data)
-        .then((response) => {
-          // Успішно оновлено на сервері
-          const updatedData = tableData.map((row) => ({
-            ...row,
-            isEditing: false,
-          }));
-          setTableData(updatedData);
-        })
-        .catch((error) => {
-          console.error("Помилка при збереженні змін:", error);
-        });
-    }
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    dispatch(saveRow({ id }));
   };
 
   return (
@@ -111,7 +49,6 @@ const TableComponent = () => {
                         const updatedData = tableData.map((r) =>
                           r.id === row.id ? { ...r, data: newData } : r
                         );
-                        setTableData(updatedData);
                       }}
                     />
                   </td>
@@ -124,7 +61,6 @@ const TableComponent = () => {
                         const updatedData = tableData.map((r) =>
                           r.id === row.id ? { ...r, data: newData } : r
                         );
-                        setTableData(updatedData);
                       }}
                     />
                   </td>
@@ -140,7 +76,6 @@ const TableComponent = () => {
                         const updatedData = tableData.map((r) =>
                           r.id === row.id ? { ...r, data: newData } : r
                         );
-                        setTableData(updatedData);
                       }}
                     />
                   </td>
@@ -156,7 +91,6 @@ const TableComponent = () => {
                         const updatedData = tableData.map((r) =>
                           r.id === row.id ? { ...r, data: newData } : r
                         );
-                        setTableData(updatedData);
                       }}
                     />
                   </td>
@@ -172,7 +106,6 @@ const TableComponent = () => {
                         const updatedData = tableData.map((r) =>
                           r.id === row.id ? { ...r, data: newData } : r
                         );
-                        setTableData(updatedData);
                       }}
                     />
                   </td>
@@ -201,17 +134,7 @@ const TableComponent = () => {
           ))}
         </tbody>
       </Table>
-      <Pagination>
-        {Array.from({ length: totalPages }, (_, index) => (
-          <Pagination.Item
-            key={index + 1}
-            active={currentPage === index + 1}
-            onClick={() => handlePageChange(index + 1)}
-          >
-            {index + 1}
-          </Pagination.Item>
-        ))}
-      </Pagination>
+      <PaginationElement />
     </>
   );
 };
