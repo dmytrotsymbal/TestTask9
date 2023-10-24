@@ -2,11 +2,14 @@ import { useEffect } from "react";
 import { Table, Button } from "react-bootstrap";
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
 import { editRow, saveRow, fetchTableData } from "../redux/tableSlice";
-import PaginationElement from "./PaginationElement";
+import CustomLoader from "./CustomLoader";
+
+import "../styles/TableComponent.scss";
 
 const TableComponent = () => {
   const tableData = useAppSelector((state) => state.table.tableData);
   const currentPage = useAppSelector((state) => state.table.currentPage);
+  const loading = useAppSelector((state) => state.table.loading);
 
   const dispatch = useAppDispatch();
 
@@ -23,20 +26,27 @@ const TableComponent = () => {
   };
 
   return (
-    <>
-      <Table striped bordered hover>
-        <thead>
+    <Table striped bordered hover className="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Birthday date</th>
+          <th>Phone number</th>
+          <th>Address</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {loading ? (
           <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Birthday date</th>
-            <th>Phone number</th>
-            <th>Address</th>
-            <th>Actions</th>
+            <td colSpan={6}>
+              <CustomLoader />
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {tableData.map((row) => (
+        ) : (
+          tableData.map((row) => (
             <tr key={row.id}>
               {row.isEditing ? (
                 <>
@@ -57,7 +67,10 @@ const TableComponent = () => {
                       type="text"
                       value={row.data.email}
                       onChange={(e) => {
-                        const newData = { ...row.data, email: e.target.value };
+                        const newData = {
+                          ...row.data,
+                          email: e.target.value,
+                        };
                         const updatedData = tableData.map((r) =>
                           r.id === row.id ? { ...r, data: newData } : r
                         );
@@ -131,11 +144,10 @@ const TableComponent = () => {
                 </>
               )}
             </tr>
-          ))}
-        </tbody>
-      </Table>
-      <PaginationElement />
-    </>
+          ))
+        )}
+      </tbody>
+    </Table>
   );
 };
 

@@ -12,10 +12,13 @@ const LoginForm = (props: Props) => {
 
   const onSubmit = async (values: any) => {
     try {
-      const response = await axios.post("http://146.190.118.121/api/login/", {
-        username: values.username,
-        password: values.password,
-      });
+      const response = await axios.post(
+        "https://technical-task-api.icapgroupgmbh.com/api/login/",
+        {
+          username: values.username,
+          password: values.password,
+        }
+      );
       if (response.status === 200) {
         window.location.href = "/table";
       } else {

@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-export type TableData = {
+type TableData = {
   name: string;
   email: string;
   birthday_date: string;
@@ -9,7 +9,7 @@ export type TableData = {
   address?: string;
 };
 
-export type TableRow = {
+type TableRow = {
   id: number;
   data: TableData;
   isEditing: boolean;
@@ -19,6 +19,7 @@ interface TableState {
   tableData: TableRow[];
   currentPage: number;
   totalPages: number;
+  loading: boolean;
 }
 
 export const fetchTableData = createAsyncThunk(
@@ -26,8 +27,7 @@ export const fetchTableData = createAsyncThunk(
   async (page: number) => {
     const limit = 10;
     const offset = (page - 1) * limit;
-    const apiUrl = `http://146.190.118.121/api/table/?limit=${limit}&offset=${offset}`;
-
+    const apiUrl = `https://technical-task-api.icapgroupgmbh.com/api/table/?limit=${limit}&offset=${offset}`;
     const response = await axios.get(apiUrl);
     const data = response.data.results;
     const tableRows = data.map((item: TableData, index: number) => ({
@@ -45,7 +45,12 @@ export const fetchTableData = createAsyncThunk(
 
 const tableSlice = createSlice({
   name: "table",
-  initialState: { tableData: [], currentPage: 1, totalPages: 0 } as TableState,
+  initialState: {
+    tableData: [],
+    currentPage: 1,
+    totalPages: 0,
+    loading: false,
+  } as TableState,
   reducers: {
     editRow: (state, action) => {
       const { id } = action.payload;
@@ -60,7 +65,10 @@ const tableSlice = createSlice({
       if (editedRow) {
         // Відправка змінених даних на сервер та оновлення стану
         axios
-          .put(`http://146.190.118.121/api/table/${id}`, editedRow.data)
+          .put(
+            `https://technical-task-api.icapgroupgmbh.com/api/table/${id}/`,
+            editedRow.data
+          )
           .then((response) => {
             const updatedData = state.tableData.map((row) => ({
               ...row,
@@ -79,14 +87,15 @@ const tableSlice = createSlice({
       state.tableData = action.payload.tableData;
       state.currentPage = action.payload.currentPage;
       state.totalPages = action.payload.totalPages;
+      state.loading = false;
     });
 
-    builder.addCase(fetchTableData.rejected, (state, action) => {
-      console.error("Помилка завантаження даних:", action.error);
+    builder.addCase(fetchTableData.rejected, (state) => {
+      state.loading = false;
     });
 
-    builder.addCase(fetchTableData.pending, (state, action) => {
-      console.log("Завантаження даних...", action.meta);
+    builder.addCase(fetchTableData.pending, (state) => {
+      state.loading = true;
     });
   },
 });
