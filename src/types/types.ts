@@ -13,6 +13,7 @@ export type TableRow = {
 };
 
 export type TableState = {
+  originalTableData: TableRow[];
   tableData: TableRow[];
   currentPage: number;
   totalPages: number;

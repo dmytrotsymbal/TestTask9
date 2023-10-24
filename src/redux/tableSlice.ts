@@ -5,7 +5,7 @@ import { TableState, TableData } from "../types/types";
 export const fetchTableData = createAsyncThunk(
   "table/fetchData",
   async (page: number) => {
-    const limit = 10;
+    const limit = 20;
     const offset = (page - 1) * limit;
     const apiUrl = `https://technical-task-api.icapgroupgmbh.com/api/table/?limit=${limit}&offset=${offset}`;
     const response = await axios.get(apiUrl);
@@ -26,6 +26,7 @@ export const fetchTableData = createAsyncThunk(
 const tableSlice = createSlice({
   name: "table",
   initialState: {
+    originalTableData: [],
     tableData: [],
     currentPage: 1,
     totalPages: 0,
@@ -79,9 +80,28 @@ const tableSlice = createSlice({
         a.data.birthday_date.localeCompare(b.data.birthday_date)
       );
     },
+
+    searchByName: (state, action) => {
+      const searchTerm = action.payload;
+      if (searchTerm.trim() === "") {
+        state.trouble = null;
+        state.tableData = state.originalTableData;
+      } else {
+        state.tableData = state.originalTableData.filter((row) =>
+          row.data.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        if (state.tableData.length === 0) {
+          state.trouble = "No results found";
+        } else {
+          state.trouble = null;
+        }
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchTableData.fulfilled, (state, action) => {
+      state.originalTableData = action.payload.tableData;
       state.tableData = action.payload.tableData;
       state.currentPage = action.payload.currentPage;
       state.totalPages = action.payload.totalPages;
@@ -101,7 +121,13 @@ const tableSlice = createSlice({
   },
 });
 
-export const { editRow, saveRow, sortByName, sortByBirthdayDate, sortByEmail } =
-  tableSlice.actions;
+export const {
+  editRow,
+  saveRow,
+  sortByName,
+  sortByBirthdayDate,
+  sortByEmail,
+  searchByName,
+} = tableSlice.actions;
 
 export default tableSlice.reducer;

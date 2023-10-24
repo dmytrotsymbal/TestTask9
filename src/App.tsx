@@ -10,7 +10,14 @@ const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 type Props = {};
 const App = (props: Props) => {
   return (
-    <>
+    <div
+      style={{
+        overflowX: "auto",
+        overflowY: "auto",
+        height: "100vh",
+        width: "100%",
+      }}
+    >
       <Container>
         <Suspense fallback={<CustomLoader />}>
           <Routes>
@@ -20,7 +27,7 @@ const App = (props: Props) => {
           </Routes>
         </Suspense>
       </Container>
-    </>
+    </div>
   );
 };
 export default App;
