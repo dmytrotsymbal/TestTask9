@@ -1,6 +1,16 @@
+tr {
+  th {
+    font-weight: 400;
+  }
+}
+
 .troubleMessage {
   text-align: center;
   .troubleImg {
     width: 300px;
+  }
+  .troubleText {
+    font-size: 18px;
+    font-weight: 300;
   }
 }

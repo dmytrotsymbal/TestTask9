@@ -3,13 +3,14 @@ import { Table, Button } from "react-bootstrap";
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
 import { editRow, saveRow, fetchTableData } from "../redux/tableSlice";
 import CustomLoader from "./CustomLoader";
-
 import "../styles/TableComponent.scss";
+import TroubleMike from "../assets/troubleMike.png";
 
 const TableComponent = () => {
   const tableData = useAppSelector((state) => state.table.tableData);
   const currentPage = useAppSelector((state) => state.table.currentPage);
   const loading = useAppSelector((state) => state.table.loading);
+  const trouble = useAppSelector((state) => state.table.trouble);
 
   const dispatch = useAppDispatch();
 
@@ -38,6 +39,16 @@ const TableComponent = () => {
         </tr>
       </thead>
 
+      {trouble && (
+        <tbody>
+          <tr>
+            <td className="troubleMessage" colSpan={6}>
+              <img className="troubleImg" src={TroubleMike} alt="TroubleMike" />
+              <p className="troubleText">{trouble}</p>
+            </td>
+          </tr>
+        </tbody>
+      )}
       <tbody>
         {loading ? (
           <tr>

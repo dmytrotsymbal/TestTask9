@@ -1,26 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-
-type TableData = {
-  name: string;
-  email: string;
-  birthday_date: string;
-  phone_number: string;
-  address?: string;
-};
-
-type TableRow = {
-  id: number;
-  data: TableData;
-  isEditing: boolean;
-};
-
-interface TableState {
-  tableData: TableRow[];
-  currentPage: number;
-  totalPages: number;
-  loading: boolean;
-}
+import { TableState, TableData } from "../types/types";
 
 export const fetchTableData = createAsyncThunk(
   "table/fetchData",
@@ -50,6 +30,7 @@ const tableSlice = createSlice({
     currentPage: 1,
     totalPages: 0,
     loading: false,
+    trouble: null,
   } as TableState,
   reducers: {
     editRow: (state, action) => {
@@ -63,7 +44,6 @@ const tableSlice = createSlice({
       const { id } = action.payload;
       const editedRow = state.tableData.find((row) => row.id === id);
       if (editedRow) {
-        // Відправка змінених даних на сервер та оновлення стану
         axios
           .put(
             `https://technical-task-api.icapgroupgmbh.com/api/table/${id}/`,
@@ -88,14 +68,17 @@ const tableSlice = createSlice({
       state.currentPage = action.payload.currentPage;
       state.totalPages = action.payload.totalPages;
       state.loading = false;
+      state.trouble = null;
     });
 
     builder.addCase(fetchTableData.rejected, (state) => {
       state.loading = false;
+      state.trouble = "An error occurred while processing your request";
     });
 
     builder.addCase(fetchTableData.pending, (state) => {
       state.loading = true;
+      state.trouble = null;
     });
   },
 });
