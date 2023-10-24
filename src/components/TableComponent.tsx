@@ -1,10 +1,16 @@
 import { useEffect } from "react";
 import { Table, Button } from "react-bootstrap";
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
-import { editRow, saveRow, fetchTableData } from "../redux/tableSlice";
+import {
+  editRow,
+  saveRow,
+  fetchTableData,
+  sortByName,
+} from "../redux/tableSlice";
 import CustomLoader from "./CustomLoader";
 import "../styles/TableComponent.scss";
 import TroubleMike from "../assets/troubleMike.png";
+import TableHeader from "./TableHeader";
 
 const TableComponent = () => {
   const tableData = useAppSelector((state) => state.table.tableData);
@@ -28,16 +34,7 @@ const TableComponent = () => {
 
   return (
     <Table striped bordered hover className="table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Birthday date</th>
-          <th>Phone number</th>
-          <th>Address</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
+      <TableHeader />
 
       {trouble && (
         <tbody>

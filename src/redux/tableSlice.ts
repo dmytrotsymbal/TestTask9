@@ -61,6 +61,24 @@ const tableSlice = createSlice({
           });
       }
     },
+
+    sortByName: (state) => {
+      state.tableData = state.tableData.sort((a, b) =>
+        a.data.name.localeCompare(b.data.name)
+      );
+    },
+
+    sortByEmail: (state) => {
+      state.tableData = state.tableData.sort((a, b) =>
+        a.data.email.localeCompare(b.data.email)
+      );
+    },
+
+    sortByBirthdayDate: (state) => {
+      state.tableData = state.tableData.sort((a, b) =>
+        a.data.birthday_date.localeCompare(b.data.birthday_date)
+      );
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchTableData.fulfilled, (state, action) => {
@@ -83,6 +101,7 @@ const tableSlice = createSlice({
   },
 });
 
-export const { editRow, saveRow } = tableSlice.actions;
+export const { editRow, saveRow, sortByName, sortByBirthdayDate, sortByEmail } =
+  tableSlice.actions;
 
 export default tableSlice.reducer;

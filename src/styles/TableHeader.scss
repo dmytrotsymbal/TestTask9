@@ -1,0 +1,17 @@
+tr {
+  th {
+    font-weight: 400;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    &:hover {
+      background-color: rgb(183, 191, 192);
+    }
+  }
+
+  .filterName,
+  .filterBirthday {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+}
